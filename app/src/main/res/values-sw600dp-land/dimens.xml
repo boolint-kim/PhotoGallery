@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 태블릿 가로모드용 크기값 (6열 사진 그리드) -->
+    <dimen name="photo_item_padding">6dp</dimen>
+    <dimen name="photo_item_margin">3dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_padding">24dp</dimen>
+
+    <!-- 텍스트 크기 (태블릿 가로모드) -->
+    <dimen name="photo_title_text_size">14sp</dimen>
+    <dimen name="photo_description_text_size">11sp</dimen>
+
+    <!-- 아이콘 크기 -->
+    <dimen name="action_button_size">44dp</dimen>
+
+    <!-- 그리드 설정 -->
+    <integer name="grid_columns">6</integer>
+    <dimen name="grid_item_spacing">3dp</dimen>
+    <dimen name="grid_padding">6dp</dimen>
+</resources>

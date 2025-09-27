@@ -1,0 +1,54 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Photo Gallery</string>
+
+    <!-- Toolbar -->
+    <string name="app_title">Photo Gallery</string>
+
+    <!-- Photo Item -->
+    <string name="sample_photo_title">Sample Photo Title</string>
+    <string name="sample_photo_description">Photo description or details</string>
+
+    <!-- Content Descriptions for Accessibility -->
+    <string name="photo_image">Photo image</string>
+
+    <!-- Loading States -->
+    <string name="loading">Loading...</string>
+    <string name="loading_more">Loading more photos...</string>
+
+    <!-- Error Messages -->
+    <string name="error_loading_photos">Failed to load photos</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="retry">Retry</string>
+
+    <!-- Empty States -->
+    <string name="no_photos">No photos available</string>
+    <string name="no_photos_subtitle">Pull to refresh or try again later</string>
+
+    <!-- Actions -->
+    <string name="refresh">Refresh</string>
+    <string name="share">Share</string>
+    <string name="settings">Settings</string>
+
+    <!-- Search -->
+    <string name="search_hint">Search photos...</string>
+    <string name="search_results">Search results</string>
+    <string name="no_search_results">No photos found</string>
+
+    <!-- Settings (Future Use) -->
+    <string name="dark_mode">Dark mode</string>
+    <string name="grid_size">Grid size</string>
+    <string name="data_saver">Data saver</string>
+
+    <!-- Grid Layout -->
+    <string name="grid_3_columns">3 columns</string>
+    <string name="grid_4_columns">4 columns</string>
+    <string name="grid_5_columns">5 columns</string>
+    <string name="grid_6_columns">6 columns</string>
+
+    <!-- Photo Details -->
+    <string name="photo_title_label">Title</string>
+    <string name="photo_description_label">Description</string>
+    <string name="photo_date_label">Date</string>
+    <string name="photo_size_label">Size</string>
+</resources>
