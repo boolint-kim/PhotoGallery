@@ -62,11 +62,7 @@ public class ResponsiveLayoutHelper {
     public int getGridColumns() {
         switch (getScreenType()) {
             case FOLDABLE:
-                if (isGalaxyFold()) {
-                    return isLandscape ? 5 : 4; // 갤럭시 폴드: 펼침 5열, 접음 4열
-                } else {
-                    return isLandscape ? 6 : 4; // 일반 대형 화면
-                }
+                return isLandscape ? 6 : 3;
             case TABLET:
                 return isLandscape ? 6 : 3; // 태블릿: 가로 6열, 세로 3열
             case PHONE_LANDSCAPE:
