@@ -28,34 +28,11 @@ import java.util.List;
 
 import androidx.core.view.WindowInsetsControllerCompat;
 
+// Glide 관련 import 추가
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 
-
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
-
-import android.content.res.Configuration;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.appbar.AppBarLayout;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -184,27 +161,42 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
 
-        Log.d(TAG, "RecyclerView setup with " + photoList.size() + " photo items, columns: " + layoutHelper.getGridColumns());
+        Log.d(TAG, "RecyclerView setup with " + photoList.size() +
+                " items, columns: " + layoutHelper.getGridColumns());
     }
 
     private void setupGridLayout() {
         int columns = layoutHelper.getGridColumns();
 
-        // 모든 화면에서 그리드 레이아웃 사용
+        // 그리드 레이아웃 매니저
         GridLayoutManager gridLayout = new GridLayoutManager(this, columns);
         recyclerView.setLayoutManager(gridLayout);
 
-        // 그리드 아이템 간격 설정
-        int spacing = getResources().getDimensionPixelSize(R.dimen.grid_item_spacing);
-        if (spacing > 0) {
-            // 기존 데코레이션 제거
-            while (recyclerView.getItemDecorationCount() > 0) {
-                recyclerView.removeItemDecorationAt(0);
-            }
-            recyclerView.addItemDecoration(new GridSpacingItemDecoration(columns, spacing, true));
+        // 기존 데코레이션 제거
+        while (recyclerView.getItemDecorationCount() > 0) {
+            recyclerView.removeItemDecorationAt(0);
         }
 
-        Log.d(TAG, "Grid layout setup: " + layoutHelper.getScreenType() + ", columns: " + columns + ", spacing: " + spacing + "dp");
+        // 그리드 아이템 간격 설정
+        int spacing = getResources().getDimensionPixelSize(R.dimen.grid_item_spacing);
+        boolean includeEdge = true; // 가장자리에도 간격 적용
+
+        recyclerView.addItemDecoration(
+                new GridSpacingItemDecoration(columns, spacing, includeEdge)
+        );
+
+        // RecyclerView 최적화 설정
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+        Log.d(TAG, String.format(
+                "Grid layout: %s, columns: %d, spacing: %ddp",
+                layoutHelper.getScreenType(),
+                columns,
+                spacing
+        ));
     }
 
     private void setupScrollEffect() {
@@ -261,22 +253,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 화면 회전 시 그리드 업데이트
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.d(TAG, "Configuration changed: " +
-                (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? "Landscape" : "Portrait"));
 
-        // 상태바 아이콘 색상 재설정 (다크모드 전환 시)
+        Log.d(TAG, "Configuration changed: " +
+                (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ?
+                        "Landscape" : "Portrait"));
+
+        // 상태바 아이콘 색상 재설정
         setupStatusBar();
 
         // 화면 회전 시 레이아웃 다시 설정
         layoutHelper = new ResponsiveLayoutHelper(this);
+
+        // 현재 스크롤 위치 저장
+        GridLayoutManager layoutManager =
+                (GridLayoutManager) recyclerView.getLayoutManager();
+        int scrollPosition;
+        if (layoutManager != null) {
+            scrollPosition = layoutManager.findFirstVisibleItemPosition();
+        } else {
+            scrollPosition = 0;
+        }
+
+        // 그리드 레이아웃 재설정
         setupGridLayout();
 
         // 어댑터 새로고침
         if (adapter != null) {
             adapter.notifyDataSetChanged();
+
+            // 스크롤 위치 복원
+            recyclerView.post(() -> {
+                GridLayoutManager glm =
+                        (GridLayoutManager) recyclerView.getLayoutManager();
+                if (glm != null) {
+                    glm.scrollToPositionWithOffset(scrollPosition, 0);
+                }
+            });
         }
     }
 
@@ -334,10 +350,20 @@ public class MainActivity extends AppCompatActivity {
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     }
 
-    // === PhotoAdapter - 사진 그리드 전용 어댑터 ===
+    /**
+     * PhotoAdapter - Glide를 사용한 사진 그리드 어댑터
+     */
     public static class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
         private List<PhotoItem> photoItems;
         private OnPhotoClickListener clickListener;
+
+        // Glide 요청 옵션 (재사용을 위해 static으로 선언)
+        private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.placeholder_photo)
+                .error(R.drawable.placeholder_photo)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(10000); // 10초 타임아웃
 
         public interface OnPhotoClickListener {
             void onPhotoClick(PhotoItem photoItem, int position);
@@ -395,11 +421,21 @@ public class MainActivity extends AppCompatActivity {
                 holder.photoTitle.setText(photoItem.getTitle());
             }
 
-            // 사진 설명 설정 (태블릿에서만 표시)
-            if (holder.photoDescription != null) {
-                holder.photoDescription.setText(photoItem.getDescription());
+            // Glide로 이미지 로드
+            String imageUrl = photoItem.getImageUrl();
+
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                // 원격 URL에서 이미지 로드
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .apply(GLIDE_OPTIONS)
+                        .into(holder.photoImage);
+            } else {
+                // URL이 없으면 플레이스홀더 표시
+                Glide.with(holder.itemView.getContext())
+                        .load(R.drawable.placeholder_photo)
+                        .into(holder.photoImage);
             }
-            holder.photoImage.setImageResource(R.drawable.icon);
 
             // 클릭 리스너 설정
             holder.itemView.setOnClickListener(v -> {
@@ -414,17 +450,119 @@ public class MainActivity extends AppCompatActivity {
             return photoItems.size();
         }
 
-        // === PhotoViewHolder - 사진 아이템 뷰홀더 ===
+        @Override
+        public void onViewRecycled(@NonNull PhotoViewHolder holder) {
+            super.onViewRecycled(holder);
+            // 메모리 누수 방지를 위해 Glide 요청 취소
+            Glide.with(holder.itemView.getContext()).clear(holder.photoImage);
+        }
+
+        /**
+         * PhotoViewHolder - 사진 아이템 뷰홀더
+         */
         public static class PhotoViewHolder extends RecyclerView.ViewHolder {
-            TextView photoTitle, photoDescription;
+            TextView photoTitle;
             ImageView photoImage;
 
             public PhotoViewHolder(@NonNull View itemView) {
                 super(itemView);
                 photoTitle = itemView.findViewById(R.id.photoTitle);
-                photoDescription = itemView.findViewById(R.id.photoDescription);
                 photoImage = itemView.findViewById(R.id.photoImage);
             }
         }
     }
+
+//    // === PhotoAdapter - 사진 그리드 전용 어댑터 ===
+//    public static class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
+//        private List<PhotoItem> photoItems;
+//        private OnPhotoClickListener clickListener;
+//
+//        public interface OnPhotoClickListener {
+//            void onPhotoClick(PhotoItem photoItem, int position);
+//        }
+//
+//        public PhotoAdapter(List<PhotoItem> photoItems) {
+//            this.photoItems = photoItems;
+//        }
+//
+//        public void setOnPhotoClickListener(OnPhotoClickListener listener) {
+//            this.clickListener = listener;
+//        }
+//
+//        // 사진 데이터 업데이트
+//        public void updatePhotoData(List<PhotoItem> newPhotoItems) {
+//            this.photoItems = newPhotoItems;
+//            notifyDataSetChanged();
+//        }
+//
+//        // 개별 사진 추가
+//        public void addPhotoItem(PhotoItem photoItem) {
+//            photoItems.add(photoItem);
+//            notifyItemInserted(photoItems.size() - 1);
+//        }
+//
+//        // 여러 사진 추가
+//        public void addPhotoItems(List<PhotoItem> newPhotoItems) {
+//            int startPosition = photoItems.size();
+//            photoItems.addAll(newPhotoItems);
+//            notifyItemRangeInserted(startPosition, newPhotoItems.size());
+//        }
+//
+//        // 사진 제거
+//        public void removePhotoItem(int position) {
+//            if (position >= 0 && position < photoItems.size()) {
+//                photoItems.remove(position);
+//                notifyItemRemoved(position);
+//            }
+//        }
+//
+//        @NonNull
+//        @Override
+//        public PhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//            View view = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.photo_item, parent, false);
+//            return new PhotoViewHolder(view);
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(@NonNull PhotoViewHolder holder, int position) {
+//            PhotoItem photoItem = photoItems.get(position);
+//
+//            // 사진 제목 설정
+//            if (holder.photoTitle != null) {
+//                holder.photoTitle.setText(photoItem.getTitle());
+//            }
+//
+//            // 사진 설명 설정 (태블릿에서만 표시)
+//            if (holder.photoDescription != null) {
+//                holder.photoDescription.setText(photoItem.getDescription());
+//            }
+//            holder.photoImage.setImageResource(R.drawable.icon);
+//
+//            // 클릭 리스너 설정
+//            holder.itemView.setOnClickListener(v -> {
+//                if (clickListener != null) {
+//                    clickListener.onPhotoClick(photoItem, position);
+//                }
+//            });
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//            return photoItems.size();
+//        }
+//
+//        // === PhotoViewHolder - 사진 아이템 뷰홀더 ===
+//        public static class PhotoViewHolder extends RecyclerView.ViewHolder {
+//            TextView photoTitle, photoDescription;
+//            ImageView photoImage;
+//
+//            public PhotoViewHolder(@NonNull View itemView) {
+//                super(itemView);
+//                photoTitle = itemView.findViewById(R.id.photoTitle);
+//                photoDescription = itemView.findViewById(R.id.photoDescription);
+//                photoImage = itemView.findViewById(R.id.photoImage);
+//            }
+//        }
+//    }
 }

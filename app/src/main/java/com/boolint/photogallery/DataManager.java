@@ -49,7 +49,9 @@ public class DataManager {
         }
     }
 
-    // 기본 사진 목록 생성
+    // DataManager.java의 generateDefaultPhotoList() 메서드 교체
+
+    // 기본 사진 목록 생성 (실제 이미지 URL 사용)
     private List<MainActivity.PhotoItem> generateDefaultPhotoList() {
         List<MainActivity.PhotoItem> items = new ArrayList<>();
 
@@ -75,21 +77,49 @@ public class DataManager {
                 "Snow-covered landscape", "Fresh spring blooms", "Vibrant summer scene", "Golden harvest time", "Cozy rainy weather"
         };
 
+        // Unsplash 무료 이미지 URL (실제로 사용 가능)
+        // 각 카테고리별 실제 이미지 URL
         String[] imageUrls = {
-                "", "https://example.com/mountain1.jpg", "https://example.com/city1.jpg",
-                "https://example.com/forest1.jpg", "https://example.com/ocean1.jpg", "https://example.com/cherry1.jpg",
-                "https://example.com/desert1.jpg", "https://example.com/aurora1.jpg", "https://example.com/waterfall1.jpg",
-                "https://example.com/autumn1.jpg", "https://example.com/snow1.jpg", "https://example.com/garden1.jpg",
-                "https://example.com/lake1.jpg", "https://example.com/sky1.jpg", "https://example.com/river1.jpg",
-                "https://example.com/urban1.jpg", "https://example.com/lighthouse1.jpg", "https://example.com/prairie1.jpg",
-                "https://example.com/rock1.jpg", "https://example.com/misty1.jpg", "https://example.com/tropical1.jpg",
-                "https://example.com/forestlake1.jpg", "https://example.com/canyon1.jpg", "https://example.com/meadow1.jpg",
-                "https://example.com/starry1.jpg", "https://example.com/bridge1.jpg", "https://example.com/country1.jpg",
-                "https://example.com/coastal1.jpg", "https://example.com/wildlife1.jpg", "https://example.com/harbor1.jpg",
-                "https://example.com/stream1.jpg", "https://example.com/vintage1.jpg", "https://example.com/modern1.jpg",
-                "https://example.com/rural1.jpg", "https://example.com/island1.jpg", "https://example.com/winter1.jpg",
-                "https://example.com/spring1.jpg", "https://example.com/summer1.jpg", "https://example.com/harvest1.jpg",
-                "https://example.com/rainy1.jpg"
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400",  // Sunset
+                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",  // Mountain
+                "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400",  // City Lights
+                "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400",  // Forest
+                "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=400",  // Ocean
+                "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=400",  // Cherry Blossoms
+                "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400",  // Desert
+                "https://images.unsplash.com/photo-1579033461380-adb47c3eb938?w=400",  // Northern Lights
+                "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400",  // Waterfall
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",  // Autumn
+                "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400",  // Snow Mountains
+                "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",  // Garden
+                "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400",  // Lake
+                "https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400",  // Sky
+                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",  // River Valley
+                "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400",  // Urban
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",  // Lighthouse
+                "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400",  // Prairie
+                "https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?w=400",  // Rock
+                "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=400",  // Misty
+                "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",  // Tropical
+                "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400",  // Forest Lake
+                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",  // Canyon
+                "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",  // Meadow
+                "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400",  // Starry Night
+                "https://images.unsplash.com/photo-1515705576963-95cad62945b6?w=400",  // Bridge
+                "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400",  // Country Road
+                "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400",  // Coastal
+                "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=400",  // Wildlife
+                "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",  // Harbor
+                "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400",  // Stream
+                "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=400",  // Vintage
+                "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400",  // Modern Skyline
+                "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400",  // Rural
+                "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",  // Island
+                "https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=400",  // Winter
+                "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",  // Spring
+                "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400",  // Summer
+                "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400",  // Harvest
+                "https://images.unsplash.com/photo-1428908728789-d2de25dbd4e2?w=400"   // Rainy
         };
 
         for (int i = 0; i < titles.length; i++) {

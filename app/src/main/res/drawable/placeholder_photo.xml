@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 이미지 로딩 실패 시 표시될 플레이스홀더 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- 배경 -->
+    <path
+        android:fillColor="?attr/colorSurfaceVariant"
+        android:pathData="M0,0h200v200h-200z"/>
+
+    <!-- 이미지 아이콘 외곽선 -->
+    <path
+        android:fillColor="?attr/colorOnSurfaceVariant"
+        android:fillAlpha="0.6"
+        android:pathData="M150,50H50c-5.5,0-10,4.5-10,10v80c0,5.5,4.5,10,10,10h100c5.5,0,10-4.5,10-10V60C160,54.5,155.5,50,150,50z M150,140H50V60h100V140z"/>
+
+    <!-- 산 모양 (사진 아이콘) -->
+    <path
+        android:fillColor="?attr/colorOnSurfaceVariant"
+        android:fillAlpha="0.6"
+        android:pathData="M110,105l-15,20l-10,-13.3L70,130h60L110,105z"/>
+
+    <!-- 태양 (원) -->
+    <path
+        android:fillColor="?attr/colorOnSurfaceVariant"
+        android:fillAlpha="0.6"
+        android:pathData="M120,80m-8,0a8,8 0,1,1 16,0a8,8 0,1,1 -16,0"/>
+</vector>

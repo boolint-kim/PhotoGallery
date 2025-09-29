@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 휴대폰 가로모드용 크기값 (6열 사진 그리드) -->
-    <dimen name="photo_item_padding">3dp</dimen>
-    <dimen name="photo_item_margin">1dp</dimen>
-    <dimen name="toolbar_height">48dp</dimen>
+    <!-- 휴대폰 세로모드용 크기값 (3열 사진 그리드) -->
+    <dimen name="photo_item_padding">4dp</dimen>
+    <dimen name="photo_item_margin">2dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
     <dimen name="toolbar_padding">16dp</dimen>
 
-    <!-- 텍스트 크기 (더 작게) -->
-    <dimen name="photo_title_text_size">10sp</dimen>
-    <dimen name="photo_description_text_size">8sp</dimen>
+    <!-- 텍스트 크기 -->
+    <dimen name="photo_title_text_size">12sp</dimen>
+    <dimen name="photo_description_text_size">10sp</dimen>
 
     <!-- 그리드 설정 -->
-    <integer name="grid_columns">6</integer>
-    <dimen name="grid_item_spacing">1dp</dimen>
-    <dimen name="grid_padding">2dp</dimen>
+    <integer name="grid_columns">3</integer>
+    <dimen name="grid_item_spacing">20dp</dimen>
+    <dimen name="grid_padding">4dp</dimen>
+
+    <!-- 아이템 고정 높이 (정사각형 느낌) -->
+    <dimen name="photo_item_image_height">120dp</dimen>
+
+<!--    &lt;!&ndash; 휴대폰 세로모드용 크기값 (3열 사진 그리드) &ndash;&gt;-->
+<!--    <dimen name="photo_item_padding">4dp</dimen>-->
+<!--    <dimen name="photo_item_margin">2dp</dimen>-->
+<!--    <dimen name="toolbar_height">56dp</dimen>-->
+<!--    <dimen name="toolbar_padding">16dp</dimen>-->
+
+<!--    &lt;!&ndash; 텍스트 크기 &ndash;&gt;-->
+<!--    <dimen name="photo_title_text_size">12sp</dimen>-->
+<!--    <dimen name="photo_description_text_size">10sp</dimen>-->
+
+<!--    &lt;!&ndash; 그리드 설정 &ndash;&gt;-->
+<!--    <integer name="grid_columns">3</integer>-->
+<!--    <dimen name="grid_item_spacing">4dp</dimen>-->
+<!--    <dimen name="grid_padding">4dp</dimen>-->
+
+<!--    &lt;!&ndash; 아이템 고정 높이 (정사각형 느낌) &ndash;&gt;-->
+<!--    <dimen name="photo_item_image_height">120dp</dimen>-->
 </resources>

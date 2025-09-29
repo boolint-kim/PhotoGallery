@@ -12,6 +12,6 @@
 
     <!-- 그리드 설정 -->
     <integer name="grid_columns">6</integer>
-    <dimen name="grid_item_spacing">1dp</dimen>
+    <dimen name="grid_item_spacing">20dp</dimen>
     <dimen name="grid_padding">2dp</dimen>
 </resources>
