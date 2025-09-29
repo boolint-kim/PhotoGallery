@@ -26,24 +26,35 @@ import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.List;
 
+import androidx.core.view.WindowInsetsControllerCompat;
+
+
+
+import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.content.res.Configuration;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.activity.EdgeToEdge;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.appbar.AppBarLayout;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 반응형 레이아웃 헬퍼
     private ResponsiveLayoutHelper layoutHelper;
+
+    // WindowInsetsController for status bar control
+    private WindowInsetsControllerCompat windowInsetsController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 뷰 초기화
         initViews();
+
+        // 상태바 아이콘 색상 설정
+        setupStatusBar();
 
         // Edge-to-Edge 윈도우 인셋 처리
         setupEdgeToEdgeInsets();
@@ -101,6 +118,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         appBarLayout = findViewById(R.id.appBarLayout);
         toolbar = findViewById(R.id.toolbar);
+    }
+
+    private void setupStatusBar() {
+        // WindowInsetsController 초기화
+        windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+
+        if (windowInsetsController != null) {
+            // 다크 모드 확인
+            int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            boolean isDarkMode = nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+
+            // 상태바 아이콘 색상 설정
+            // 다크모드: 밝은 아이콘 (false), 라이트모드: 어두운 아이콘 (true)
+            windowInsetsController.setAppearanceLightStatusBars(!isDarkMode);
+
+            Log.d(TAG, "Status bar setup - Dark mode: " + isDarkMode + ", Light icons: " + isDarkMode);
+        }
     }
 
     private void setupEdgeToEdgeInsets() {
@@ -180,6 +214,9 @@ public class MainActivity extends AppCompatActivity {
                 // 투명도 조절
                 float ratio = Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange();
                 toolbar.setAlpha(1 - ratio);
+
+                // 상태바 아이콘 색상은 항상 유지 (스크롤과 무관)
+                // 이미 setupStatusBar()에서 설정했으므로 여기서는 변경하지 않음
             }
         });
     }
@@ -215,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Log.d(TAG, "onResume called");
 
+        // 상태바 아이콘 색상 재설정 (다른 액티비티에서 돌아왔을 때)
+        setupStatusBar();
+
         // 사진 데이터가 변경되었을 수 있으므로 어댑터 새로고침
         if (adapter != null) {
             adapter.updatePhotoData(dataManager.getPhotoList());
@@ -226,6 +266,9 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "Configuration changed: " +
                 (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? "Landscape" : "Portrait"));
+
+        // 상태바 아이콘 색상 재설정 (다크모드 전환 시)
+        setupStatusBar();
 
         // 화면 회전 시 레이아웃 다시 설정
         layoutHelper = new ResponsiveLayoutHelper(this);
