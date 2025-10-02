@@ -3,10 +3,13 @@ package com.boolint.photogallery;
 import android.content.Intent;
 import android.os.Bundle;
 import android.content.res.Configuration;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +25,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String ICON_API = "http://wko.boolint.com:8080/WeatherService/WeatherInfo/ThumbKr.jsp";
 
-    // 아이콘 로드 콜백 인터페이스
     private interface IconLoadCallback {
         void onLoaded();
         void onError(Exception e);
@@ -60,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
     private DataManager dataManager;
     private ResponsiveLayoutHelper layoutHelper;
     private WindowInsetsControllerCompat windowInsetsController;
+
+    // AdMob
+    private FrameLayout adContainerView;
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
         dataManager = DataManager.getInstance();
         dataManager.initialize(this);
 
+        // AdMob 초기화
+        initializeAdMob();
+
         initViews();
         setupStatusBar();
         setupEdgeToEdgeInsets();
@@ -84,13 +99,26 @@ public class MainActivity extends AppCompatActivity {
         setupScrollEffect();
         restoreScrollPosition();
 
+        // 배너 광고 로드
+        loadBannerAd();
+
         Log.d(TAG, "Setup completed for " + layoutHelper.getScreenType());
+    }
+
+    private void initializeAdMob() {
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                Log.d(TAG, "AdMob initialized");
+            }
+        });
     }
 
     private void initViews() {
         recyclerView = findViewById(R.id.recyclerView);
         appBarLayout = findViewById(R.id.appBarLayout);
         toolbar = findViewById(R.id.toolbar);
+        adContainerView = findViewById(R.id.adContainerView);
     }
 
     private void setupStatusBar() {
@@ -116,13 +144,15 @@ public class MainActivity extends AppCompatActivity {
             int rightInset = Math.max(systemBars.right, displayCutout.right);
 
             if (isLandscape) {
-                v.setPadding(0, 0, 0, systemBars.bottom);
+                v.setPadding(0, 0, 0, 0);
                 appBarLayout.setPadding(leftInset, systemBars.top, rightInset, 0);
                 recyclerView.setPadding(leftInset, 0, rightInset, 0);
+                adContainerView.setPadding(leftInset, 0, rightInset, systemBars.bottom);
             } else {
-                v.setPadding(0, 0, 0, systemBars.bottom);
+                v.setPadding(0, 0, 0, 0);
                 appBarLayout.setPadding(0, systemBars.top, 0, 0);
                 recyclerView.setPadding(0, 0, 0, 0);
+                adContainerView.setPadding(0, 0, 0, systemBars.bottom);
             }
 
             recyclerView.setClipToPadding(false);
@@ -143,10 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 클릭 리스너 설정
         adapter.setOnMenuClickListener((menuItem, position) -> {
-            // DataManager에 선택된 메뉴 저장
             dataManager.setSelectedMenu(menuItem, position);
-
-            // SampleActivity로 이동
             Intent intent = new Intent(MainActivity.this, SampleActivity.class);
             startActivity(intent);
         });
@@ -154,14 +181,14 @@ public class MainActivity extends AppCompatActivity {
         setupGridLayout();
         recyclerView.setAdapter(adapter);
 
-        // API에서 아이콘 URL 로드 (최초 1회만)
+        // API에서 아이콘 URL 로드
         if (!dataManager.isIconUrlsLoaded()) {
             Log.d(TAG, "Loading icon URLs from API...");
             loadIconUrlsFromApiAsync(menuList, ICON_API, new IconLoadCallback() {
                 @Override
                 public void onLoaded() {
                     runOnUiThread(() -> {
-                        dataManager.setIconUrlsLoaded(true); // 로드 완료 플래그 설정
+                        dataManager.setIconUrlsLoaded(true);
                         if (adapter != null) {
                             adapter.notifyDataSetChanged();
                         }
@@ -172,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onError(Exception e) {
                     Log.e(TAG, "Icon load failed", e);
-                    // 폴백(drawable)로 그대로 표시됨
                 }
             });
         } else {
@@ -184,20 +210,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupGridLayout() {
+        // ResponsiveLayoutHelper에서 동적으로 값 가져오기
         int columns = layoutHelper.getGridColumns();
+        int spacing = layoutHelper.getGridSpacing();
 
         GridLayoutManager gridLayout = new GridLayoutManager(this, columns);
         recyclerView.setLayoutManager(gridLayout);
 
+        // 기존 decoration 제거
         while (recyclerView.getItemDecorationCount() > 0) {
             recyclerView.removeItemDecorationAt(0);
         }
 
-        int spacing = getResources().getDimensionPixelSize(R.dimen.grid_item_spacing);
+        // dp를 픽셀로 변환
+        float density = getResources().getDisplayMetrics().density;
+        int spacingPx = (int) (spacing * density);
         boolean includeEdge = true;
 
         recyclerView.addItemDecoration(
-                new GridSpacingItemDecoration(columns, spacing, includeEdge)
+                new GridSpacingItemDecoration(columns, spacingPx, includeEdge)
         );
 
         recyclerView.setHasFixedSize(true);
@@ -236,8 +267,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void loadBannerAd() {
+        if (adView != null) {
+            adContainerView.removeAllViews();
+            adView.destroy();
+        }
+
+        AdSize adSize = getAdSize();
+        adView = new AdView(this);
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        adView.setAdSize(adSize);
+
+        adContainerView.removeAllViews();
+        adContainerView.addView(adView);
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
+        Log.d(TAG, "Banner ad loaded with size: " + adSize.toString());
+    }
+
+    private AdSize getAdSize() {
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float density = outMetrics.density;
+        float adWidthPixels = adContainerView.getWidth();
+
+        if (adWidthPixels == 0) {
+            adWidthPixels = outMetrics.widthPixels;
+        }
+
+        int adWidth = (int) (adWidthPixels / density);
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    }
+
     @Override
     protected void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
         super.onPause();
 
         GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
@@ -251,6 +321,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (adView != null) {
+            adView.resume();
+        }
         Log.d(TAG, "onResume called");
 
         setupStatusBar();
@@ -258,6 +331,14 @@ public class MainActivity extends AppCompatActivity {
         if (adapter != null) {
             adapter.updateMenuData(dataManager.getMenuList());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -270,7 +351,9 @@ public class MainActivity extends AppCompatActivity {
 
         setupStatusBar();
 
+        // ResponsiveLayoutHelper 재생성
         layoutHelper = new ResponsiveLayoutHelper(this);
+        Log.d(TAG, layoutHelper.getDebugInfo());
 
         GridLayoutManager layoutManager =
                 (GridLayoutManager) recyclerView.getLayoutManager();
@@ -294,16 +377,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        // 광고 크기 재조정
+        recyclerView.post(() -> loadBannerAd());
     }
 
-    /**
-     * MenuAdapter - 메뉴 그리드 어댑터
-     */
     public static class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder> {
         private List<MenuItem> menuItems;
         private OnMenuClickListener clickListener;
 
-        // Glide 요청 옵션 (썸네일용)
         private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
                 .centerCrop()
                 .placeholder(R.drawable.placeholder_photo)
@@ -362,26 +444,21 @@ public class MainActivity extends AppCompatActivity {
                 holder.photoTitle.setText(menuItem.getTitle());
             }
 
-            // 썸네일 이미지 로드 (캐시 시그니처 포함)
             long cacheKey = System.currentTimeMillis() / 300_000;
 
-            // iconUrl이 있으면 우선적으로 사용, 없으면 로컬 icon 리소스 사용
             if (menuItem.getIconUrl() != null && !menuItem.getIconUrl().isEmpty()) {
-                // API에서 가져온 원격 URL 이미지
                 Glide.with(holder.itemView.getContext())
                         .load(menuItem.getIconUrl())
                         .apply(GLIDE_OPTIONS)
                         .signature(new ObjectKey(cacheKey))
                         .into(holder.photoImage);
             } else if (menuItem.getIcon() != 0) {
-                // 로컬 리소스 아이콘
                 Glide.with(holder.itemView.getContext())
                         .load(menuItem.getIcon())
                         .apply(GLIDE_OPTIONS)
                         .signature(new ObjectKey(cacheKey))
                         .into(holder.photoImage);
             } else {
-                // 플레이스홀더 표시
                 Glide.with(holder.itemView.getContext())
                         .load(R.drawable.placeholder_photo)
                         .into(holder.photoImage);
@@ -417,12 +494,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * API에서 아이콘 URL을 비동기로 로드
-     * @param list 메뉴 아이템 리스트
-     * @param endpoint API 엔드포인트
-     * @param cb 콜백
-     */
     private void loadIconUrlsFromApiAsync(List<MenuItem> list, String endpoint, IconLoadCallback cb) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -452,11 +523,9 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     String json = body.string();
-                    // {"files":[{"argument":"radar_nordic_image_reflectivity","url":"http://...jpg"}, ...]}
                     JSONObject root = new JSONObject(json);
                     JSONArray files = root.optJSONArray("files");
                     if (files != null) {
-                        // argument → url 맵 구성
                         HashMap<String, String> map = new HashMap<>();
                         for (int i = 0; i < files.length(); i++) {
                             JSONObject o = files.getJSONObject(i);
@@ -466,7 +535,6 @@ public class MainActivity extends AppCompatActivity {
                                 map.put(arg, url);
                             }
                         }
-                        // vo.apiOption과 argument 매칭하여 iconUrl 세팅
                         for (MenuItem vo : list) {
                             String url = map.get(vo.apiOption);
                             if (url != null) vo.iconUrl = url;
