@@ -51,4 +51,107 @@
     <string name="photo_description_label">Description</string>
     <string name="photo_date_label">Date</string>
     <string name="photo_size_label">Size</string>
+
+
+    <string name="btn_add_favorite">Add to Favorites</string>
+    <string name="cancel">Cancel</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="info_cctv_copyright">Ministry of Land, Infrastructure and Transport</string>
+    <string name="info_cctv_copyright_jeju">JEJU</string>
+    <string name="info_img_copyright"> </string>
+
+    <string name="k1">"Visible\nKorea"</string>
+    <string name="k2">Visible\nEast Asia</string>
+    <string name="k3">Visible\nEarth</string>
+    <string name="k4">"Infrared\nKorea"</string>
+    <string name="k5">Infrared\nEast Asia</string>
+    <string name="k6">Infrared\nEarth</string>
+    <string name="k7">"Water Vapor\nKorea"</string>
+    <string name="k8">Water Vapor\nEast Asia</string>
+    <string name="k9">Water Vapor\nEarth</string>
+    <string name="k10">"Radar\nKorea"</string>
+    <string name="k11">Radar\nInfrared</string>
+    <string name="k12">Radar\nDetail</string>
+    <string name="k13">Radar\nCCTV</string>
+    <string name="k14">Snow\nRain</string>
+    <string name="k15">Temperature</string>
+    <string name="k16">Typhoon</string>
+    <string name="k17">Visual\nMap</string>
+    <string name="k18">Forecast</string>
+    <string name="k19">Yellow\nWind</string>
+    <string name="k20">Weather\nchart</string>
+    <string name="k21">Weather\nCast</string>
+
+    <string name="menu_deltempfile">Delete Temporary Files</string>
+    <string name="menu_earth">Infrared\nEarth</string>
+    <string name="msg_delete">Delete Temporary Files?</string>
+    <string name="msg_err_internet">check internet connection or radar center</string>
+    <string name="msg_error">Error!</string>
+    <string name="msg_exit">Exit?</string>
+    <string name="msg_new_service">The service began on April 1, 2011, and COMS Satellite 1, after 9 years of meteorological mission, ended its service on March 31, 2020. We will update the app as soon as the GEO-KOMPSAT-2A Satellite API service starts.</string>
+    <string name="msg_no">No</string>
+    <string name="msg_not_support">Not supported menu!</string>
+    <string name="msg_notempfiles">No temporary files to delete!</string>
+    <string name="msg_unknown_error">Unknown Error!</string>
+    <string name="msg_yes">Yes</string>
+    <string name="permission_required_message">This feature requires location permission. Please allow the permission in settings.</string>
+    <string name="permission_required_title">Permission Required</string>
+
+    <string name="t1">Bangnyng</string>
+    <string name="t2">Hwacheon</string>
+    <string name="t3">Gangneung</string>
+    <string name="t4">Inchon</string>
+    <string name="t5">Seoul</string>
+    <string name="t6">RadarCenter</string>
+    <string name="t7">Gunsan</string>
+    <string name="t8">Korea</string>
+    <string name="t9">Chunsong</string>
+    <string name="t10">Jindo</string>
+    <string name="t11">Satellite</string>
+    <string name="t12">Busan</string>
+    <string name="t13">Gosan</string>
+    <string name="t14">Seongsan</string>
+    <string name="t15"></string>
+
+    <string name="time_suffix"></string>
+    <string name="tv08">Radar\nKorea neighbor</string>
+    <string name="tv_favorite">⭐️ Region</string>
+    <string name="tv_hour">hour</string>
+    <string name="tv_hours">hours</string>
+    <string name="tv_humidity">hum</string>
+    <string name="tv_later">later</string>
+    <string name="tv_minute">minute</string>
+    <string name="tv_minutes">minutes</string>
+    <string name="tv_search_region">Enter an address</string>
+    <string name="tv_touchscreen">Touch on the map and watch CCTV</string>
+    <string name="tv_wind_direction">w/d</string>
+    <string name="tv_wind_speed">w/s</string>
+    <string name="weather_clear">Clear</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_drizzle">Drizzle</string>
+    <string name="weather_humidity">Hum</string>
+    <string name="weather_overcast">Overcast</string>
+    <string name="weather_precipitation_amount">Rain</string>
+    <string name="weather_precipitation_probability">PoP</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_rain_snow_mix">Rain/Snow</string>
+    <string name="weather_shower">Shower</string>
+    <string name="weather_sleet">Sleet</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_snow_flurry">Flurries</string>
+    <string name="weather_snowfall">Snow</string>
+    <string name="weather_today">Today</string>
+    <string name="weather_wind">Wind</string>
+
+    <string-array name="wind_directions">
+        <item>E</item>
+        <item>NE</item>
+        <item>N</item>
+        <item>NW</item>
+        <item>S</item>
+        <item>SE</item>
+        <item>SW</item>
+        <item>W</item>
+    </string-array>
+
 </resources>
