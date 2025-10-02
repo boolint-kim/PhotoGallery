@@ -97,12 +97,12 @@ public class ResponsiveLayoutHelper {
 
     /**
      * RecyclerView 컬럼 수 반환 (사진 그리드용)
-     * 폴더블 펼친 상태: 세로/가로 모두 3열
+     * 폴더블 펼친 상태: 세로/가로 모두 6열
      */
     public int getGridColumns() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return 3; // 세로/가로 모두 3열
+                return 6; // 세로/가로 모두 6열
             case TABLET:
                 return isLandscape ? 6 : 3; // 태블릿: 가로 6열, 세로 3열
             case PHONE_LANDSCAPE:
@@ -115,12 +115,12 @@ public class ResponsiveLayoutHelper {
 
     /**
      * 그리드 아이템 간격 반환 (dp)
-     * 폴더블: 휴대폰과 태블릿 사이
+     * 폴더블 6열: 작은 간격
      */
     public int getGridSpacing() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return 80; // 중간 크기 (휴대폰 20dp, 태블릿 60dp의 중간)
+                return 20; // 6열이므로 간격을 줄임
             case TABLET:
                 return 60; // 태블릿: 큰 간격
             case PHONE_LANDSCAPE:
@@ -136,7 +136,7 @@ public class ResponsiveLayoutHelper {
     public int getItemPadding() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return 6; // 중간 (휴대폰 4dp, 태블릿 8dp의 중간)
+                return 3; // 6열이므로 패딩을 줄임
             case TABLET:
                 return 8;
             case PHONE_LANDSCAPE:
@@ -152,7 +152,7 @@ public class ResponsiveLayoutHelper {
     public int getItemMargin() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return 3; // 중간 (휴대폰 2dp, 태블릿 4dp의 중간)
+                return 2; // 6열이므로 마진을 줄임
             case TABLET:
                 return 4;
             case PHONE_LANDSCAPE:
@@ -168,7 +168,7 @@ public class ResponsiveLayoutHelper {
     public int getTitleTextSize() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return 13; // 중간 (휴대폰 12sp, 태블릿 16sp의 중간)
+                return 10; // 6열이므로 텍스트 크기를 줄임
             case TABLET:
                 return 16;
             case PHONE_LANDSCAPE:
@@ -285,7 +285,7 @@ public class ResponsiveLayoutHelper {
     public ThumbnailSize getOptimalThumbnailSize() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return new ThumbnailSize(150, 85); // 중간 크기
+                return new ThumbnailSize(120, 67); // 6열에 맞는 작은 크기
             case TABLET:
                 return new ThumbnailSize(320, 180);
             case PHONE_LANDSCAPE:

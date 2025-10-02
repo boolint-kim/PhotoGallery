@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 갤럭시 Z 폴드 펼친 상태용: 6열 사진 그리드 아이템 (작은 크기) -->
+<!-- 갤럭시 Z 폴드 펼친 상태 가로모드용: 6열 사진 그리드 아이템 (작은 크기) -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -42,7 +42,7 @@
             android:id="@+id/photoTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:text="Photo Title"
             android:textColor="?attr/colorOnSurface"
             android:textSize="10sp"

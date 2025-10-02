@@ -38,7 +38,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 6열 사진 그리드뷰 -->
+    <!-- 6열 사진 그리드뷰 - paddingBottom은 코드에서 동적으로 설정 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -48,7 +48,6 @@
         android:paddingTop="2dp"
         android:paddingLeft="2dp"
         android:paddingRight="2dp"
-        android:paddingBottom="60dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <!-- AdMob 배너 광고 컨테이너 -->

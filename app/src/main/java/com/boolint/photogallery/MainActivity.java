@@ -9,6 +9,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,9 +26,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
@@ -146,13 +149,43 @@ public class MainActivity extends AppCompatActivity {
             if (isLandscape) {
                 v.setPadding(0, 0, 0, 0);
                 appBarLayout.setPadding(leftInset, systemBars.top, rightInset, 0);
+                // recyclerView 패딩은 광고 로드 후 동적으로 설정
                 recyclerView.setPadding(leftInset, 0, rightInset, 0);
-                adContainerView.setPadding(leftInset, 0, rightInset, systemBars.bottom);
+
+                // 광고 컨테이너: 좌우 시스템바(상태바/네비게이션바) 영역 피하기
+                // 가로모드에서는 상태바가 왼쪽, 네비게이션바가 오른쪽에 세로로 배치됨
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) adContainerView.getLayoutParams();
+
+                // 좌우 마진으로 상태바/네비게이션바 영역 피하기
+                params.leftMargin = leftInset;
+                params.rightMargin = rightInset;
+                params.bottomMargin = systemBars.bottom; // 하단 시스템바가 있다면
+                adContainerView.setLayoutParams(params);
+
+                // 패딩은 0으로 (마진으로 처리)
+                adContainerView.setPadding(0, 0, 0, 0);
+
+                Log.d(TAG, String.format("Landscape ad container - leftMargin: %d, rightMargin: %d, bottomMargin: %d",
+                        leftInset, rightInset, systemBars.bottom));
+
             } else {
                 v.setPadding(0, 0, 0, 0);
                 appBarLayout.setPadding(0, systemBars.top, 0, 0);
+                // recyclerView 패딩은 광고 로드 후 동적으로 설정
                 recyclerView.setPadding(0, 0, 0, 0);
-                adContainerView.setPadding(0, 0, 0, systemBars.bottom);
+
+                // 세로모드: 하단 네비게이션바만 고려
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) adContainerView.getLayoutParams();
+                params.leftMargin = 0;
+                params.rightMargin = 0;
+                params.bottomMargin = systemBars.bottom;
+                adContainerView.setLayoutParams(params);
+
+                adContainerView.setPadding(0, 0, 0, 0);
+
+                Log.d(TAG, String.format("Portrait ad container - bottomMargin: %d", systemBars.bottom));
             }
 
             recyclerView.setClipToPadding(false);
@@ -278,13 +311,170 @@ public class MainActivity extends AppCompatActivity {
         adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
         adView.setAdSize(adSize);
 
+        // 광고 리스너 설정하여 로드 완료 시 RecyclerView 패딩 조정
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Log.d(TAG, "Ad loaded successfully");
+                // 광고 로드 후 약간의 지연을 두고 패딩 조정 (레이아웃 완료 대기)
+                adContainerView.postDelayed(() -> updateRecyclerViewPadding(), 100);
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+                Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+                // 광고 로드 실패 시에도 기본 패딩 설정
+                setDefaultRecyclerViewPadding();
+            }
+        });
+
         adContainerView.removeAllViews();
         adContainerView.addView(adView);
+
+        // 광고 추가 후 마진 재확인 및 설정
+        adContainerView.post(() -> {
+            ensureAdContainerMargins();
+        });
+
+        // 광고 컨테이너 레이아웃 리스너 추가
+        adContainerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        // 한 번만 실행하도록 리스너 제거는 하지 않음 (크기 변경 감지 위해)
+                        if (adContainerView.getHeight() > 0) {
+                            updateRecyclerViewPadding();
+                        }
+                    }
+                });
 
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
-        Log.d(TAG, "Banner ad loaded with size: " + adSize.toString());
+        Log.d(TAG, "Banner ad loading with size: " + adSize.toString());
+    }
+
+    /**
+     * 광고 컨테이너의 마진이 제대로 설정되었는지 확인하고 필요시 재설정
+     */
+    private void ensureAdContainerMargins() {
+        Insets systemBars = ViewCompat.getRootWindowInsets(adContainerView)
+                .getInsets(WindowInsetsCompat.Type.systemBars());
+        Insets displayCutout = ViewCompat.getRootWindowInsets(adContainerView)
+                .getInsets(WindowInsetsCompat.Type.displayCutout());
+
+        int leftInset = Math.max(systemBars.left, displayCutout.left);
+        int rightInset = Math.max(systemBars.right, displayCutout.right);
+
+        boolean isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+
+        androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
+                (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) adContainerView.getLayoutParams();
+
+        if (isLandscape) {
+            params.leftMargin = leftInset;
+            params.rightMargin = rightInset;
+            params.bottomMargin = systemBars.bottom;
+        } else {
+            params.leftMargin = 0;
+            params.rightMargin = 0;
+            params.bottomMargin = systemBars.bottom;
+        }
+
+        adContainerView.setLayoutParams(params);
+
+        Log.d(TAG, String.format("Ad container margins ensured - left: %d, right: %d, bottom: %d",
+                params.leftMargin, params.rightMargin, params.bottomMargin));
+    }
+
+    /**
+     * 광고 높이에 맞춰 RecyclerView 패딩 동적 조정
+     */
+    private void updateRecyclerViewPadding() {
+        adContainerView.post(() -> {
+            int adHeight = adContainerView.getHeight();
+            if (adHeight > 0) {
+                float density = getResources().getDisplayMetrics().density;
+
+                // 광고 높이 + 추가 여유 공간 (아이템이 완전히 보이도록)
+                // 기본 여유 공간 24dp + 아이템 예상 높이의 일부
+                int basicExtraPadding = (int) (24 * density);
+
+                // 아이템의 대략적인 높이 계산 (화면 너비 / 컬럼 수)
+                DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+                int screenWidth = displayMetrics.widthPixels;
+                int columns = layoutHelper.getGridColumns();
+                int itemWidth = screenWidth / columns;
+                // 정사각형 이미지 + 텍스트 + 패딩 고려 (대략 1.3배)
+                int itemHeight = (int) (itemWidth * 1.3);
+
+                // 전체 패딩 = 광고 높이 + 기본 여유 + 아이템 높이의 1/4
+                int totalPadding = adHeight + basicExtraPadding + (itemHeight / 4);
+
+                boolean isLandscape = getResources().getConfiguration().orientation
+                        == Configuration.ORIENTATION_LANDSCAPE;
+
+                Insets systemBars = ViewCompat.getRootWindowInsets(recyclerView)
+                        .getInsets(WindowInsetsCompat.Type.systemBars());
+                Insets displayCutout = ViewCompat.getRootWindowInsets(recyclerView)
+                        .getInsets(WindowInsetsCompat.Type.displayCutout());
+
+                int leftInset = Math.max(systemBars.left, displayCutout.left);
+                int rightInset = Math.max(systemBars.right, displayCutout.right);
+
+                if (isLandscape) {
+                    recyclerView.setPadding(leftInset, 0, rightInset, totalPadding);
+                } else {
+                    recyclerView.setPadding(0, 0, 0, totalPadding);
+                }
+
+                Log.d(TAG, String.format("RecyclerView padding updated: adHeight=%d, itemHeight=%d, totalPadding=%d",
+                        adHeight, itemHeight, totalPadding));
+            } else {
+                setDefaultRecyclerViewPadding();
+            }
+        });
+    }
+
+    /**
+     * 기본 RecyclerView 패딩 설정 (광고가 없거나 로드 실패 시)
+     */
+    private void setDefaultRecyclerViewPadding() {
+        float density = getResources().getDisplayMetrics().density;
+
+        // 아이템의 대략적인 높이 계산
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int screenWidth = displayMetrics.widthPixels;
+        int columns = layoutHelper.getGridColumns();
+        int itemWidth = screenWidth / columns;
+        int itemHeight = (int) (itemWidth * 1.3);
+
+        // 기본 광고 예상 높이(80dp) + 기본 여유(24dp) + 아이템 높이의 1/4
+        int defaultAdHeight = (int) (80 * density);
+        int extraPadding = (int) (24 * density);
+        int defaultPadding = defaultAdHeight + extraPadding + (itemHeight / 4);
+
+        boolean isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+
+        Insets systemBars = ViewCompat.getRootWindowInsets(recyclerView)
+                .getInsets(WindowInsetsCompat.Type.systemBars());
+        Insets displayCutout = ViewCompat.getRootWindowInsets(recyclerView)
+                .getInsets(WindowInsetsCompat.Type.displayCutout());
+
+        int leftInset = Math.max(systemBars.left, displayCutout.left);
+        int rightInset = Math.max(systemBars.right, displayCutout.right);
+
+        if (isLandscape) {
+            recyclerView.setPadding(leftInset, 0, rightInset, defaultPadding);
+        } else {
+            recyclerView.setPadding(0, 0, 0, defaultPadding);
+        }
+
+        Log.d(TAG, "RecyclerView default padding set: " + defaultPadding);
     }
 
     private AdSize getAdSize() {
@@ -293,10 +483,21 @@ public class MainActivity extends AppCompatActivity {
         display.getMetrics(outMetrics);
 
         float density = outMetrics.density;
-        float adWidthPixels = adContainerView.getWidth();
+        float adWidthPixels = outMetrics.widthPixels;
 
-        if (adWidthPixels == 0) {
-            adWidthPixels = outMetrics.widthPixels;
+        // 가로모드에서는 좌우 시스템바(상태바/네비게이션바)를 고려한 실제 가용 너비 사용
+        boolean isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+
+        if (isLandscape) {
+            androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
+                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) adContainerView.getLayoutParams();
+
+            // 좌우 마진을 제외한 실제 사용 가능한 너비
+            adWidthPixels -= (params.leftMargin + params.rightMargin);
+
+            Log.d(TAG, String.format("Ad width calculation - total: %.0f, leftMargin: %d, rightMargin: %d, available: %.0f",
+                    (float)outMetrics.widthPixels, params.leftMargin, params.rightMargin, adWidthPixels));
         }
 
         int adWidth = (int) (adWidthPixels / density);
