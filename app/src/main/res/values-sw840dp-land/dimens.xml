@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 폴더블 펼친 상태 가로모드 (3열) -->
+    <dimen name="photo_item_padding">6dp</dimen>
+    <dimen name="photo_item_margin">3dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_padding">20dp</dimen>
+
+    <!-- 폴더블 펼친 상태 가로모드: 3열, 큰 이미지 -->
+    <dimen name="photo_image_size">@dimen/photo_image_size_large</dimen>
+
+    <!-- 텍스트 크기 (3열) -->
+    <dimen name="photo_title_text_size">19sp</dimen>
+    <dimen name="photo_description_text_size">12sp</dimen>
+
+    <!-- 아이콘 크기 -->
+    <dimen name="action_button_size">40dp</dimen>
+
+    <!-- 그리드 설정 - 3열 -->
+    <integer name="grid_columns">3</integer>
+    <dimen name="grid_item_spacing">40dp</dimen>
+    <dimen name="grid_padding">6dp</dimen>
+
+    <!-- 검색바 크기 -->
+    <dimen name="search_view_width">300dp</dimen>
+    <dimen name="search_view_height">40dp</dimen>
+</resources>

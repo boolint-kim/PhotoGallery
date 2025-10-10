@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 태블릿 가로모드: 정사각형 이미지 + 2줄 텍스트 (중간 크기, 6열) -->
+<!-- 태블릿 가로모드: 6열 사진 그리드 아이템 (90dp 이미지) -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="3dp"
+    android:layout_margin="@dimen/photo_item_margin"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
     android:clickable="true"
@@ -15,42 +15,34 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/photo_item_padding">
 
-        <!-- 정사각형 이미지 (중간 크기) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/photoImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:scaleType="centerCrop"
-                android:background="?attr/colorSurfaceVariant"
-                android:contentDescription="@string/photo_image"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintDimensionRatio="1:1"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- 사진 이미지 (90dp 정사각형) -->
+        <ImageView
+            android:id="@+id/photoImage"
+            android:layout_width="@dimen/photo_image_size"
+            android:layout_height="@dimen/photo_image_size"
+            android:layout_gravity="center"
+            android:background="?attr/colorSurfaceVariant"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/photo_image" />
 
         <!-- 제목 (최대 2줄, 중간 텍스트) -->
         <TextView
             android:id="@+id/photoTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_marginTop="6dp"
             android:text="@string/sample_photo_title"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="12sp"
+            android:textSize="@dimen/photo_title_text_size"
             android:textStyle="normal"
             android:maxLines="2"
             android:minLines="2"
             android:ellipsize="end"
-            android:gravity="start|center_vertical"
-            android:lineHeight="16dp" />
+            android:gravity="center"
+            android:lineHeight="14dp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

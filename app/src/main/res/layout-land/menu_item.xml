@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 가로모드용: 6열 사진 그리드 아이템 (작은 크기) -->
+<!-- 가로모드용: 6열 사진 그리드 아이템 (70dp 이미지) -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="1dp"
+    android:layout_margin="@dimen/photo_item_margin"
     app:cardCornerRadius="4dp"
     app:cardElevation="1dp"
     android:clickable="true"
@@ -16,26 +16,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="3dp">
+        android:padding="@dimen/photo_item_padding">
 
-        <!-- 사진 이미지 (정사각형) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/photoImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="#E0E0E0"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/photo_image"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintDimensionRatio="1:1"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- 사진 이미지 (70dp 정사각형) -->
+        <ImageView
+            android:id="@+id/photoImage"
+            android:layout_width="@dimen/photo_image_size"
+            android:layout_height="@dimen/photo_image_size"
+            android:layout_gravity="center"
+            android:background="#E0E0E0"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/photo_image" />
 
         <!-- 제목 (작은 텍스트) -->
         <TextView
@@ -45,7 +36,7 @@
             android:layout_marginTop="3dp"
             android:text="@string/sample_photo_title"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="10sp"
+            android:textSize="@dimen/photo_title_text_size"
             android:textStyle="normal"
             android:maxLines="1"
             android:ellipsize="end"

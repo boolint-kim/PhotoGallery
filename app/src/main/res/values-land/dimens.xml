@@ -6,9 +6,12 @@
     <dimen name="toolbar_height">48dp</dimen>
     <dimen name="toolbar_padding">16dp</dimen>
 
+    <!-- 휴대폰 가로모드: 6열, 작은 이미지 -->
+    <dimen name="photo_image_size">@dimen/photo_image_size_small</dimen>
+
     <!-- 텍스트 크기 (더 작게) -->
-    <dimen name="photo_title_text_size">10sp</dimen>
-    <dimen name="photo_description_text_size">8sp</dimen>
+    <dimen name="photo_title_text_size">13sp</dimen>
+    <dimen name="photo_description_text_size">11sp</dimen>
 
     <!-- 그리드 설정 -->
     <integer name="grid_columns">6</integer>

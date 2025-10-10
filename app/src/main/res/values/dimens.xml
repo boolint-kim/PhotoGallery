@@ -6,15 +6,20 @@
     <dimen name="toolbar_height">56dp</dimen>
     <dimen name="toolbar_padding">16dp</dimen>
 
+    <!-- 이미지 고정 크기 -->
+    <dimen name="photo_image_size_small">70dp</dimen>
+    <dimen name="photo_image_size_medium">90dp</dimen>
+    <dimen name="photo_image_size_large">110dp</dimen>
+
+    <!-- 휴대폰 세로모드: 3열, 큰 이미지 -->
+    <dimen name="photo_image_size">@dimen/photo_image_size_small</dimen>
+
     <!-- 텍스트 크기 -->
-    <dimen name="photo_title_text_size">12sp</dimen>
-    <dimen name="photo_description_text_size">10sp</dimen>
+    <dimen name="photo_title_text_size">13sp</dimen>
+    <dimen name="photo_description_text_size">11sp</dimen>
 
     <!-- 그리드 설정 -->
     <integer name="grid_columns">3</integer>
     <dimen name="grid_item_spacing">20dp</dimen>
     <dimen name="grid_padding">4dp</dimen>
-
-    <!-- 아이템 고정 높이 (정사각형 느낌) -->
-    <dimen name="photo_item_image_height">120dp</dimen>
 </resources>

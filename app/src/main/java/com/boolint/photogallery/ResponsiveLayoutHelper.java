@@ -7,7 +7,9 @@ import android.view.WindowManager;
 
 /**
  * 반응형 레이아웃을 위한 헬퍼 클래스
- * 폴더블 펼친 상태를 화면 비율로 동적 감지
+ * 수정된 컬럼 규칙:
+ * - 모든 세로모드: 3열
+ * - 모든 가로모드: 6열
  */
 public class ResponsiveLayoutHelper {
 
@@ -96,31 +98,31 @@ public class ResponsiveLayoutHelper {
     }
 
     /**
-     * RecyclerView 컬럼 수 반환 (사진 그리드용)
-     * 폴더블 펼친 상태: 세로/가로 모두 6열
+     * RecyclerView 컬럼 수 반환
+     * 수정된 규칙:
+     * - 폴더블 접었을 때: 세로 3열, 가로 6열
+     * - 폴더블 펼쳤을 때: 세로 3열, 가로 3열
+     * - 일반 휴대폰/태블릿: 세로 3열, 가로 6열
      */
     public int getGridColumns() {
-        switch (getScreenType()) {
-            case FOLDABLE_UNFOLDED:
-                return 6; // 세로/가로 모두 6열
-            case TABLET:
-                return isLandscape ? 6 : 3; // 태블릿: 가로 6열, 세로 3열
-            case PHONE_LANDSCAPE:
-                return 6; // 폰 가로: 6열
-            case PHONE:
-            default:
-                return 3; // 폰 세로: 3열
+        if (isFoldableUnfolded()) {
+            return 3; // 폴더블 펼친 상태는 항상 3열
+        } else if (isLandscape) {
+            return 6; // 폴더블 접었을 때 가로, 일반 휴대폰/태블릿 가로: 6열
+        } else {
+            return 3; // 모든 세로모드: 3열
         }
     }
 
     /**
      * 그리드 아이템 간격 반환 (dp)
-     * 폴더블 6열: 작은 간격
      */
     public int getGridSpacing() {
+        if (isFoldableUnfolded()) {
+            return 40; // 폴더블 펼친 상태: 중간 간격
+        }
+
         switch (getScreenType()) {
-            case FOLDABLE_UNFOLDED:
-                return 20; // 6열이므로 간격을 줄임
             case TABLET:
                 return 60; // 태블릿: 큰 간격
             case PHONE_LANDSCAPE:
@@ -134,15 +136,17 @@ public class ResponsiveLayoutHelper {
      * 아이템 패딩 반환 (dp)
      */
     public int getItemPadding() {
+        if (isFoldableUnfolded()) {
+            return 6; // 폴더블 펼친 상태: 중간 패딩
+        }
+
         switch (getScreenType()) {
-            case FOLDABLE_UNFOLDED:
-                return 3; // 6열이므로 패딩을 줄임
             case TABLET:
-                return 8;
+                return 6; // 태블릿: 중간 패딩
             case PHONE_LANDSCAPE:
             case PHONE:
             default:
-                return 4;
+                return 3; // 휴대폰: 작은 패딩
         }
     }
 
@@ -150,15 +154,17 @@ public class ResponsiveLayoutHelper {
      * 아이템 마진 반환 (dp)
      */
     public int getItemMargin() {
+        if (isFoldableUnfolded()) {
+            return 3; // 폴더블 펼친 상태: 중간 마진
+        }
+
         switch (getScreenType()) {
-            case FOLDABLE_UNFOLDED:
-                return 2; // 6열이므로 마진을 줄임
             case TABLET:
-                return 4;
+                return 3; // 태블릿: 중간 마진
             case PHONE_LANDSCAPE:
             case PHONE:
             default:
-                return 2;
+                return 2; // 휴대폰: 작은 마진
         }
     }
 
@@ -166,16 +172,18 @@ public class ResponsiveLayoutHelper {
      * 제목 텍스트 크기 반환 (sp)
      */
     public int getTitleTextSize() {
-        switch (getScreenType()) {
-            case FOLDABLE_UNFOLDED:
-                return 10; // 6열이므로 텍스트 크기를 줄임
-            case TABLET:
-                return 16;
-            case PHONE_LANDSCAPE:
-                return 10;
-            case PHONE:
-            default:
-                return 12;
+        if (isFoldableUnfolded()) {
+            return 12; // 폴더블 펼친 상태: 세로/가로 모두 3열이므로 12sp
+        } else if (isLandscape) {
+            return 10; // 폴더블 접었을 때 가로, 일반 휴대폰/태블릿 가로(6열): 작은 텍스트
+        } else {
+            switch (getScreenType()) {
+                case TABLET:
+                    return 14; // 태블릿 세로: 큰 텍스트
+                case PHONE:
+                default:
+                    return 12; // 휴대폰 세로: 기본 텍스트
+            }
         }
     }
 
@@ -227,7 +235,7 @@ public class ResponsiveLayoutHelper {
      * 비디오 아이템에 설명 표시 여부
      */
     public boolean shouldShowVideoDescription() {
-        return getScreenType() == ScreenType.TABLET;
+        return getScreenType() == ScreenType.TABLET && !isLandscape;
     }
 
     /**
@@ -285,14 +293,16 @@ public class ResponsiveLayoutHelper {
     public ThumbnailSize getOptimalThumbnailSize() {
         switch (getScreenType()) {
             case FOLDABLE_UNFOLDED:
-                return new ThumbnailSize(120, 67); // 6열에 맞는 작은 크기
+                return new ThumbnailSize(110, 110); // 폴더블 펼친 상태: 항상 110dp (세로/가로 모두 3열)
             case TABLET:
-                return new ThumbnailSize(320, 180);
+                return isLandscape
+                        ? new ThumbnailSize(90, 90)   // 태블릿 가로: 90dp (6열)
+                        : new ThumbnailSize(110, 110); // 태블릿 세로: 110dp (3열)
             case PHONE_LANDSCAPE:
-                return new ThumbnailSize(200, 112);
+                return new ThumbnailSize(70, 70);  // 휴대폰 가로: 70dp (6열)
             case PHONE:
             default:
-                return new ThumbnailSize(screenWidthDp - 32, 200);
+                return new ThumbnailSize(110, 110); // 휴대폰 세로: 110dp (3열)
         }
     }
 

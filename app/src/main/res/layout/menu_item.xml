@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 휴대폰 세로모드용: 3열 사진 그리드 아이템 -->
+<!-- 휴대폰 세로모드용: 3열 사진 그리드 아이템 (110dp 이미지) -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -18,24 +18,14 @@
         android:orientation="vertical"
         android:padding="@dimen/photo_item_padding">
 
-        <!-- 사진 이미지 (정사각형을 위한 AspectRatio 유지) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/photoImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="#E0E0E0"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/photo_image"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintDimensionRatio="1:1"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- 사진 이미지 (110dp 정사각형) -->
+        <ImageView
+            android:id="@+id/photoImage"
+            android:layout_width="@dimen/photo_image_size"
+            android:layout_height="@dimen/photo_image_size"
+            android:layout_gravity="center"
+            android:background="#E0E0E0"
+            android:contentDescription="@string/photo_image" />
 
         <!-- 제목 -->
         <TextView
@@ -49,7 +39,7 @@
             android:textStyle="normal"
             android:maxLines="2"
             android:ellipsize="end"
-            android:gravity="start" />
+            android:gravity="center" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

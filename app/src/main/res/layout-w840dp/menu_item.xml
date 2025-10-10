@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 갤럭시 Z 폴드 펼친 상태용: 6열 사진 그리드 아이템 (작은 크기) -->
+<!-- 폴더블 펼친 상태 세로모드용: 3열 사진 그리드 아이템 (110dp 이미지) -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="2dp"
+    android:layout_margin="@dimen/photo_item_margin"
     app:cardCornerRadius="6dp"
     app:cardElevation="2dp"
     android:clickable="true"
@@ -16,28 +16,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="3dp">
+        android:padding="@dimen/photo_item_padding">
 
-        <!-- 사진 이미지 (정사각형) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!-- 사진 이미지 (110dp 정사각형) -->
+        <ImageView
+            android:id="@+id/photoImage"
+            android:layout_width="@dimen/photo_image_size"
+            android:layout_height="@dimen/photo_image_size"
+            android:layout_gravity="center"
+            android:background="?attr/colorSurfaceVariant"
+            android:scaleType="centerCrop"
+            android:contentDescription="Photo image" />
 
-            <ImageView
-                android:id="@+id/photoImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="?attr/colorSurfaceVariant"
-                android:scaleType="centerCrop"
-                android:contentDescription="Photo image"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintDimensionRatio="1:1"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- 제목 (작은 텍스트, 최대 2줄) -->
+        <!-- 제목 (최대 2줄) -->
         <TextView
             android:id="@+id/photoTitle"
             android:layout_width="match_parent"
@@ -45,13 +36,13 @@
             android:layout_marginTop="4dp"
             android:text="Photo Title"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="10sp"
+            android:textSize="@dimen/photo_title_text_size"
             android:textStyle="normal"
             android:maxLines="2"
             android:minLines="2"
             android:ellipsize="end"
             android:gravity="center"
-            android:lineHeight="12dp" />
+            android:lineHeight="14dp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
